@@ -1,4 +1,4 @@
-const bancodedados = require('./SaveUsers');
+const bancodedados = require('../models/SaveUsers');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 
