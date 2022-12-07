@@ -1,28 +1,47 @@
 const db = require('../../bin/bancodedados')
 
-async function postUsers(usuario){
-    console.log("user", usuario)
+async function verificaEmail(usuario){
     const conn = await db.connect();
-    await conn.query('use master;');
-    const sql = `INSERT INTO users (nome,telefone,email,senha) VALUES ("${usuario.Nome}","${usuario.Telefone}","${usuario.Email}","${usuario.Senha}");`;
-    console.log("post", usuario.Nome)
-    return await conn.query(sql);
+    const [verificaEmail] = await conn.query(`SELECT COUNT(email) AS email FROM users WHERE email = "${usuario.Email}";`);
+    return verificaEmail;
 }
 
-async function getUsers(id){
+
+async function postUsers(usuario){
     const conn = await db.connect();
-    await conn.query('use master;');
-    const [rows] = await conn.query(`SELECT * FROM users WHERE id = ${id};`);
-    console.log("solo",rows)
+    await conn.query(`INSERT INTO users (nome,telefone,email,senha) VALUES ("${usuario.Nome}","${usuario.Telefone}","${usuario.Email}","${usuario.Password}");`);
+    const [getUser] = await conn.query(`SELECT * FROM users WHERE email = "${usuario.Email}";`);
+    return getUser;
+}
+
+async function putUsers(id,usuario){
+    const conn = await db.connect();
+        const update = `UPDATE  users SET 
+            nome = "${usuario.Nome}",
+            telefone = "${usuario.Telefone}",
+            email = "${usuario.Email}",
+            senha = "${usuario.Password}"
+            WHERE id = ${id};`;
+        return await conn.query(update);
+}
+
+async function getUsers(email,password){
+    const conn = await db.connect();
+    const [rows] = await conn.query(`SELECT * FROM users WHERE email = "${email}";`);
     return rows;
 }
 
 async function getUsersAll(){
     const conn = await db.connect();
-    await conn.query('use master;');
     const [rowsAll] = await conn.query(`SELECT * FROM users;`);
-    console.log("all",rowsAll)
     return [rowsAll]
 }
 
-module.exports = {postUsers, getUsers, getUsersAll}
+async function deleteUser(id){
+    const conn = await db.connect();
+    const [rowsDelete] = await conn.query(`DELETE FROM users WHERE id = ${id};`);
+    return [rowsDelete]
+}
+
+
+module.exports = {postUsers, getUsers, getUsersAll, deleteUser, putUsers,verificaEmail}
