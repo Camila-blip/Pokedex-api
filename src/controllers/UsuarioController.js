@@ -1,6 +1,5 @@
 const bancodedados = require('../models/SaveUsers');
 const jwt = require('jsonwebtoken');
-const { promisify } = require('util');
 
 exports.post = async (req, res, next) => {
     const Cadastro = {
@@ -11,7 +10,7 @@ exports.post = async (req, res, next) => {
     }
     try{
         let GetUsuarios = await bancodedados.postUsers(Cadastro) 
-        res.status(200).send({user: GetUsuarios, token: jwt.sign(GetUsuarios[0],"PRIVATEKEY")});
+        res.status(200).send({user: GetUsuarios, token: jwt.sign(GetUsuarios[0], process.env.SECRET_API)});
     }catch{
         res.status(400).send("Email já existe!");
     }
@@ -26,7 +25,7 @@ exports.get = async (req, res, next) => {
     try{
         let email = req.params.email;
         const  GetUsuarios =  await bancodedados.getUsers(email) 
-        res.status(200).send({user: GetUsuarios, token: jwt.sign(GetUsuarios[0],"PRIVATEKEY")});
+        res.status(200).send({user: GetUsuarios, token: jwt.sign(GetUsuarios[0], process.env.SECRET_API)});
     }catch{
         res.status(400).send("Sem registros!");
     }
